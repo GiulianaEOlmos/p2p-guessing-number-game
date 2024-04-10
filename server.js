@@ -24,15 +24,15 @@ class Server {
     console.log("New connection ");
     //Handle players
     const publicKey = peerInfo.publicKey.toString("hex");
-    //Si hay jugadores, nos aseguramos que sea uno nuevo usando el publicKey
-    //Si no hay jugadores, se agrega el primero
+    // If there are players, we ensure it's a new one using the publicKey.
+    // If there are no players, the first one is added.
     if (this.players.size) {
       if (!this.players.has(publicKey)) {
         console.log("New player ");
         this.players.set(publicKey, true);
         this.clients.push(socket);
       }
-      //Enviar status del ultimo guess
+      // Send status of the last guess.
       this.respontToClients(
         this.game.lastClue ?? "Guess a number between 1 and 100:"
       );
@@ -40,19 +40,19 @@ class Server {
       console.log("First player");
       this.players.set(publicKey, true);
       this.clients.push(socket);
-      //Inicializar el juego para el primer jugador
+      // Initialize the game for the first player.
       this.initializeGame();
     }
 
-    //IMPORTANTE: Para que el cliente pueda empezar a responder necesita siempre un primer mensaje del servidor que inicie el socket on del cliente
+    //IMPORTANT: In order for the client to start responding it always needs a first message from the server that starts the client's socket.on()
     //this.respontToClients("Welcome to the game!");
 
     socket.on("data", (data) => {
       const jsonData = JSON.parse(data.toString());
       console.log(`Server: ${jsonData.nickname} guessed ${jsonData.guess}`);
 
-      //Maneja las respuestas de los clientes y saber si es correcta o no
-      //converir a number el guess
+      // Handles the responses from the clients and determines if it's correct or not.
+      // Convert the guess to a number.
       const guessedNumber = parseInt(jsonData.guess);
       if (this.isValidGuess(guessedNumber)) {
         if (this.game.isStarted) {
